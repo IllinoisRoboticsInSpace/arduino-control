@@ -2,22 +2,29 @@
 
 maxon::maxon()
 {
-	pwm = 0;
-	disable = false;
-	on_off = false;
+	disable = true;
 	feedback = 0;
+
+	digitalWrite(MAXON_BRAKE, HIGH);
+	digitalWrite(MAXON_DISABLE, LOW);
 }
 
-maxon::on()
+void maxon::on()
+{
+	disable = false;
+
+	digitalWrite(MAXON_DISABLE, HIGH);
+	digitalWrite(MAXON_DIR, HIGH);
+
+	analogWrite(MAXON_SPEED, 255);
+}
+
+void maxon::off()
 {
 	disable = true;
 
-	analogWrite(pin#, 255);
-}
+	digitalWrite(MAXON_DISABLE, LOW);
+	digitalWrite(MAXON_DIR, HIGH);
 
-maxon::off()
-{
-	disable = false;
-
-	analogWrite(pin#, 0);
+	analogWrite(MAXON_SPEED, 0);
 }

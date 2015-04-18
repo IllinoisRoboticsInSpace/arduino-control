@@ -1,17 +1,26 @@
 #ifndef DISP_H
 #define DISP_H
 
+#include "Arduino.h"
 
-class Disp{
+#define DISP_SPEED 45			// Pins
+#define DISP_DIR 47
+#define DISP_BRAKE 49
+#define DISP_THERMAL 51
+#define DISP_HALL 53
+#define DISP_POT 85
+#define DISP_CURRENT 86
+
+class disp
+{
 public:
-	Disp(int input_pin);
+	disp();
 	void extendDisp();
+	void extendDispStop();
 	void retractDisp();
+	void retractDispStop();
 private:
 	bool extended;
-	int pin;
-
 };
-
 
 #endif

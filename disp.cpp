@@ -1,24 +1,54 @@
 #include "disp.h"
 
-Disp::Disp(int input_pin){
-	pin = input_pin;
+disp::disp()
+{
 	extended = false;
+
+	analogWrite(DISP_SPEED, 0);
+	digitalWrite(DISP_DIR, LOW);			//LOW - Retract, HIGH - Extend
+	digitalWrite(DISP_BRAKE, HIGH);
 }
 
-void Disp::extendDisp(){
-	if(extended == true){
+void disp::extendDisp()
+{
+	if(extended == true)
 		return;
-	}else{
-		analogWrite(pin, 122); //50 % PWM
+	else
+	{
 		extended = true;
+
+		digitalWrite(DISP_BRAKE, LOW);
+		digitalWrite(DISP_DIR, HIGH);
+
+		analogWrite(DISP_SPEED, 122); 		//50 % PWM
 	}
 }
 
-void Disp::retractDisp(){
-	if(extended == false){
+void disp::extendDispStop()
+{
+	analogWrite(DISP_SPEED, 0);
+
+	digitalWrite(DISP_BRAKE, HIGH);
+}
+
+void disp::retractDisp()
+{
+	if(extended == false)
 		return;
-	}else{
-		analogWrite(pin, 0);
+	else
+	{
 		extended = false;
+
+		digitalWrite(DISP_BRAKE, LOW);
+		digitalWrite(DISP_DIR, LOW);
+
+		analogWrite(DISP_SPEED, 122);		// 50% PWM
 	}
+}
+
+void disp::retractDispStop()
+{
+	analogWrite(DISP_SPEED, 0);
+
+	digitalWrite(DISP_BRAKE, HIGH);
 }

@@ -1,19 +1,25 @@
 #ifndef TURBINE_H
 #define TURBINE_H
 
-class Turbine{
+#include "Arduino.h"
+
+#define ARM_SPEED 46			// Pins
+#define ARM_DIR 48
+#define ARM_BRAKE 50
+#define ARM_THERMAL 52
+#define ARM_POT 82
+#define ARM_CURRENT 83
+
+class turbine
+{
 public:
-	Turbine(int input_pin);
-	void extend();
-	void retract();
-	void brake();
-	void turn_on();
-	void get_braking_state();
+	turbine();
+	void extendArm();
+	void extendArmStop();
+	void retractArm();
+	void retractArmStop();
 private:
-	int pin;
-	bool braked;
 	bool extended;
 };
-
 
 #endif
