@@ -21,9 +21,7 @@ int roboteq::roboteq_set_speed_right(char c_speed)
 	speed_r = int(c_speed);
 
 	//Scale to range of -1000, 1000
-	speed_r -= 127;
-	speed_r *= 8;
-	speed_r = -speed_r
+	speed_r = -((speed_r - 127) * 8);
 
 	//check bounds
 	if(speed_r > MAX || speed_r < MIN)
@@ -51,8 +49,7 @@ int roboteq::roboteq_set_speed_left(char c_speed)
 	speed_l = int(c_speed);
 
 	//Scale to range of -1000, 1000
-	speed_l -= 127;
-	speed_l *= 8;
+	speed_l = (speed_l - 127) * 8);
 
 	//check bounds
 	if(speed_l > MAX || speed_l < MIN)
