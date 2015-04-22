@@ -21,15 +21,14 @@ void turbine::extendArm()
 		digitalWrite(ARM_BRAKE, LOW);
 		digitalWrite(ARM_DIR, HIGH);
 
-		AnalogWrite(ARM_SPEED, 122);			// 50% PWM
+		analogWrite(ARM_SPEED, 122);			// 50% PWM
+
+		delay(1000);
+
+		analogWrite(ARM_SPEED, 0);
+
+		digitalWrite(ARM_BRAKE, HIGH);
 	}
-}
-
-void turbine::extendArmStop()
-{
-	analogWrite(ARM_SPEED, 0);
-
-	digitalWrite(ARM_BRAKE, HIGH);
 }
 
 void turbine::retractArm()
@@ -43,13 +42,12 @@ void turbine::retractArm()
 		digitalWrite(ARM_BRAKE, LOW);
 		digitalWrite(ARM_DIR, HIGH);
 
-		AnalogWrite(ARM_SPEED, 122);			// 50% PWM
+		analogWrite(ARM_SPEED, 122);			// 50% PWM
+
+		delay(1000);
+
+		analogWrite(ARM_SPEED, 0);
+
+		digitalWrite(ARM_BRAKE, HIGH);
 	}
-}
-
-void turbine::retractArmStop()
-{
-	analogWrite(ARM_SPEED, 0);
-
-	digitalWrite(ARM_BRAKE, HIGH);
 }

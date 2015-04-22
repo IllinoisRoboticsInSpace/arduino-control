@@ -21,14 +21,13 @@ void disp::extendDisp()
 		digitalWrite(DISP_DIR, HIGH);
 
 		analogWrite(DISP_SPEED, 122); 		//50 % PWM
+
+		delay(1000);
+
+		analogWrite(DISP_SPEED, 0);
+
+		digitalWrite(DISP_BRAKE, HIGH);
 	}
-}
-
-void disp::extendDispStop()
-{
-	analogWrite(DISP_SPEED, 0);
-
-	digitalWrite(DISP_BRAKE, HIGH);
 }
 
 void disp::retractDisp()
@@ -43,12 +42,11 @@ void disp::retractDisp()
 		digitalWrite(DISP_DIR, LOW);
 
 		analogWrite(DISP_SPEED, 122);		// 50% PWM
+
+		delay(1000);
+
+		analogWrite(DISP_SPEED, 0);
+
+		digitalWrite(DISP_BRAKE, HIGH);
 	}
-}
-
-void disp::retractDispStop()
-{
-	analogWrite(DISP_SPEED, 0);
-
-	digitalWrite(DISP_BRAKE, HIGH);
 }

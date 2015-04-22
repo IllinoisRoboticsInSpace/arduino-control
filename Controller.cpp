@@ -4,18 +4,19 @@
 #include "turbine.h"
 
 //Data masks for serial communication
-#define PADDLE_MASK 0x10000000
-#define BIN_MASK 0x01000000
-#define MAXON_MASK 0x00100000
+#define PADDLE_MASK 0x00000001
+#define BIN_MASK 0x00000010
+#define MAXON_MASK 0x00000100
 
 //Call the constructors
-roboteq roboteq();
-maxon maxon();
-disp disp();
-turbine turbine();
+roboteq myRoboteq = roboteq();
+maxon myMaxon = maxon();
+disp myDisp = disp();
+turbine myTurbine = turbine();
 
 //Global variables
-int packet_0, packet_1, packet_2;
+//int packet_0, packet_1, packet_2;
+char packet[5];
 
 void setup()
 {
@@ -56,36 +57,110 @@ void setup()
 	pinMode(ARM_POT, INPUT);
 	pinMode(ARM_CURRENT, INPUT);
 
+	//pinMode(13, OUTPUT);
+
 	//Serial communications
-	Serial1.begin(9600);		//ODroid Serial
+	Serial.begin(9600);		//ODroid Serial
 	Serial2.begin(115200);		//Roboteq Serial
 }
 
 void loop()
 {
-	//Wait for data to arrive
-	if(Serial1.available() > 0)
+	/*while(Serial.available() > 0)
 	{
-		//This is a test segment
-		Serial1.write(Serial1.read());
+		packet_0 = Serial.read();
+		packet_1 = Serial.read();
+		packet_2 = Serial.read();
 
-		/*
+		if(String(packet_0) == "a")
+		{
+			if(String(packet_1) == "b")
+			{
+				if(String(packet_2) == "c")
+				{
+					digitalWrite(13, HIGH);
+					delay(10000);
+					digitalWrite(13, LOW);
+				}
+			}
+		}
+	}*/
+	//Wait for data to arrive
+	if(Serial.available() > 0)
+	{
 		//Read packets
-		packet_0 = Serial1.read();
-		packet_1 = Serial1.read();
-		packet_2 = Serial1.read();
+		//packet_0 = Serial.read();
+		//packet_1 = Serial.read();
+		//packet_2 = Serial.read();
+		Serial.readBytes(packet, 5);
+		Serial.print("ACK sig\n");
 
 		//Packet_0 holds linear velocity
-		roboteq_set_speed(packet_0);
+		myRoboteq.roboteq_set_speed_left(packet[0]);
+		
 
 		//Packet_1 holds angular velocity
-		roboteq_set_direction(packet_1);
+		myRoboteq.roboteq_set_speed_right(packet[1]);
 
 		//Parse packet_3
-		if((packet_2 & PADDLE_MASK) == 0)
+		if(packet[2] == '0')
 		{
-
+			myTurbine.extendArm();
 		}
-		*/
+		else if(packet[2] == '1')
+		{
+			myTurbine.retractArm();
+		}
+
+		if(packet[3] == '1')
+		{
+			myDisp.extendDisp();
+		}
+		else fi(packet[3] == '0')
+		{
+			myDisp.retractDisp();
+		}
+
+		if(packet[4] == '1')
+		{
+			myMaxon.on();
+		}
+		else if(packet[4] == '0')
+		{
+			myMaxon.off();
+		}
+		/*
+		if((packet[2] & PADDLE_MASK) == 0x00000001)
+		{
+			myTurbine.extendArm();
+			Serial.println("ExtendArm");
+		}
+		else if((packet[2] & PADDLE_MASK) == 0)
+		{
+			myTurbine.retractArm();
+			Serial.println("RetractArm");
+		}
+
+		if((packet[2] & BIN_MASK) == 0x00000010)
+		{
+			myDisp.extendDisp();
+			Serial.println("ExtendDisp");
+		}
+		else if((packet[2] & BIN_MASK) == 0)
+		{
+			myDisp.retractDisp();
+			Serial.println("RetractDisp");
+		}
+
+		if((packet[2] & MAXON_MASK) == 0x00000100)
+		{
+			myMaxon.on();
+			Serial.println("Maxon on");
+		}
+		else if((packet[2] & MAXON_MASK) == 0)
+		{
+			myMaxon.off();
+			Serial.println("Maxon off");
+		}*/
 	}
 }
