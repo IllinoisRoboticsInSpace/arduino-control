@@ -49,7 +49,7 @@ int roboteq::roboteq_set_speed_left(char c_speed)
 	speed_l = int(c_speed);
 
 	//Scale to range of -1000, 1000
-	speed_l = (speed_l - 127) * 8);
+	speed_l = (speed_l - 127) * 8;
 
 	//check bounds
 	if(speed_l > MAX || speed_l < MIN)
