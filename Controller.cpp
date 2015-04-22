@@ -3,11 +3,6 @@
 #include "disp.h"
 #include "turbine.h"
 
-//Data masks for serial communication
-#define PADDLE_MASK 0x00000001
-#define BIN_MASK 0x00000010
-#define MAXON_MASK 0x00000100
-
 //Call the constructors
 roboteq myRoboteq = roboteq();
 maxon myMaxon = maxon();
@@ -15,8 +10,8 @@ disp myDisp = disp();
 turbine myTurbine = turbine();
 
 //Global variables
-//int packet_0, packet_1, packet_2;
 char packet[5];
+int data;
 
 void setup()
 {
@@ -57,52 +52,39 @@ void setup()
 	pinMode(ARM_POT, INPUT);
 	pinMode(ARM_CURRENT, INPUT);
 
-	//pinMode(13, OUTPUT);
-
 	//Serial communications
-	Serial.begin(9600);		//ODroid Serial
+	Serial.begin(115200);		//ODroid Serial
 	Serial2.begin(115200);		//Roboteq Serial
+	Serial.println("SIG READY");
 }
 
 void loop()
 {
-	/*while(Serial.available() > 0)
-	{
-		packet_0 = Serial.read();
-		packet_1 = Serial.read();
-		packet_2 = Serial.read();
-
-		if(String(packet_0) == "a")
-		{
-			if(String(packet_1) == "b")
-			{
-				if(String(packet_2) == "c")
-				{
-					digitalWrite(13, HIGH);
-					delay(10000);
-					digitalWrite(13, LOW);
-				}
-			}
-		}
-	}*/
 	//Wait for data to arrive
-	if(Serial.available() > 0)
+	if(Serial.available() == 5)
 	{
-		//Read packets
-		//packet_0 = Serial.read();
-		//packet_1 = Serial.read();
-		//packet_2 = Serial.read();
-		Serial.readBytes(packet, 5);
-		Serial.print("ACK sig\n");
+		data = Serial.readBytes(packet, 5);
 
-		//Packet_0 holds linear velocity
+		if(data == 5)
+		{
+			//Print back the data sent
+			Serial.write(packet);
+			Serial.flush();
+		}
+		else
+		{
+			Serial.write("Bad data!");
+			Serial.flush();
+		}
+
+		//Packet[0] holds left motor commands
 		myRoboteq.roboteq_set_speed_left(packet[0]);
 		
 
-		//Packet_1 holds angular velocity
+		//Packet[1] holds right motor commands
 		myRoboteq.roboteq_set_speed_right(packet[1]);
 
-		//Parse packet_3
+		//Packet[2] holds paddle LA commands
 		if(packet[2] == '0')
 		{
 			myTurbine.extendArm();
@@ -112,15 +94,17 @@ void loop()
 			myTurbine.retractArm();
 		}
 
+		//Packet[3] holds dispensation LA commands
 		if(packet[3] == '1')
 		{
 			myDisp.extendDisp();
 		}
-		else fi(packet[3] == '0')
+		else if(packet[3] == '0')
 		{
 			myDisp.retractDisp();
 		}
 
+		//Packet[4] holds maxon commands
 		if(packet[4] == '1')
 		{
 			myMaxon.on();
@@ -129,38 +113,5 @@ void loop()
 		{
 			myMaxon.off();
 		}
-		/*
-		if((packet[2] & PADDLE_MASK) == 0x00000001)
-		{
-			myTurbine.extendArm();
-			Serial.println("ExtendArm");
-		}
-		else if((packet[2] & PADDLE_MASK) == 0)
-		{
-			myTurbine.retractArm();
-			Serial.println("RetractArm");
-		}
-
-		if((packet[2] & BIN_MASK) == 0x00000010)
-		{
-			myDisp.extendDisp();
-			Serial.println("ExtendDisp");
-		}
-		else if((packet[2] & BIN_MASK) == 0)
-		{
-			myDisp.retractDisp();
-			Serial.println("RetractDisp");
-		}
-
-		if((packet[2] & MAXON_MASK) == 0x00000100)
-		{
-			myMaxon.on();
-			Serial.println("Maxon on");
-		}
-		else if((packet[2] & MAXON_MASK) == 0)
-		{
-			myMaxon.off();
-			Serial.println("Maxon off");
-		}*/
 	}
 }
