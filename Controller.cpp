@@ -2,22 +2,29 @@
 #include "maxon.h"
 #include "disp.h"
 #include "turbine.h"
-
+#include "FreeSixIMU.h"
+#include "FIMU_ADXL345.h"
+#include "FIMU_ITG3200.h"
 //Call the constructors
 roboteq myRoboteq = roboteq();
 maxon myMaxon = maxon();
+float deltaX;
+float deltaY;
+float deltaTheta;
+//http://stackoverflow.com/questions/28091151/double-integrating-acceleration-in-c-using-a-9dof-imu-with-sensor-fusion for double integrals
+void setup()
+{
+	/* Connections:
+	*		ODroid - Serial1(9600)
+	*		Maxon - Analog, Digital x4
 disp myDisp = disp();
 turbine myTurbine = turbine();
 
 //Global variables
 char packet[5];
 int data;
-
-void setup()
-{
-	/* Connections:
-	*		ODroid - Serial1(9600)
-	*		Maxon - Analog, Digital x4
+float accelerations[3];
+int x;
 	*		Roboteq - Serial(115200), Analog, Digital
 	*		Disp. LA - Digital(PWM), Digital x4, Analog x2
 	*		Tubine LA - Digital(PWM), Digital x4, Analog x2
@@ -55,6 +62,7 @@ void setup()
 	//Serial communications
 	Serial.begin(115200);		//ODroid Serial
 	Serial2.begin(115200);		//Roboteq Serial
+	sixDOF.init();
 	Serial.println("SIG READY");
 }
 
