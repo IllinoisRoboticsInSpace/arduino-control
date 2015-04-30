@@ -40,7 +40,7 @@ void turbine::retractArm()
 		extended = false;
 
 		digitalWrite(ARM_BRAKE, LOW);
-		digitalWrite(ARM_DIR, HIGH);
+		digitalWrite(ARM_DIR, LOW);
 
 		analogWrite(ARM_SPEED, 122);			// 50% PWM
 

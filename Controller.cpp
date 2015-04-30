@@ -1,17 +1,41 @@
+#include <SoftwareSerial.h>
+#include <Wire.h>
 #include "Roboteq.h"
 #include "maxon.h"
 #include "disp.h"
 #include "turbine.h"
+#include "FreeSixIMU.h"
+#include "FIMU_ADXL345.h"
+#include "FIMU_ITG3200.h"
+
+//Define the serial port pins
+#define SLAM_RX 	19
+#define SLAM_TX 	18
+#define ROBOTEQ_RX 	17
+#define ROBOTEQ_TX 	16
+
+//Define serial communications
+SoftwareSerial serial1(SLAM_RX, SLAM_TX);
+SoftwareSerial serial2(ROBOTEQ_RX, ROBOTEQ_TX);
 
 //Call the constructors
 roboteq myRoboteq = roboteq();
 maxon myMaxon = maxon();
 disp myDisp = disp();
 turbine myTurbine = turbine();
+FreeSixIMU imu = FreeSixIMU();
 
 //Global variables
 char packet[5];
 int data;
+
+String speed_l;
+String speed_r;
+
+float values[6];
+int t0;
+int t1;
+int delta;
 
 void setup()
 {
@@ -52,23 +76,42 @@ void setup()
 	pinMode(ARM_POT, INPUT);
 	pinMode(ARM_CURRENT, INPUT);
 
+    //SLAM serial port
+    pinMode(SLAM_RX, INPUT);
+    pinMode(SLAM_TX, OUTPUT);
+        
+    //Roboteq serial port        
+    pinMode(ROBOTEQ_RX, INPUT);
+    pinMode(ROBOTEQ_TX, OUTPUT);
+        
 	//Serial communications
-	Serial.begin(115200);		//ODroid Serial
-	Serial2.begin(115200);		//Roboteq Serial
-	Serial.println("SIG READY");
+	Serial.begin(115200);	  //ODroid Serial
+    serial1.begin(115200);    //SLAM Serial
+	serial2.begin(115200);	  //Roboteq Serial
+
+	//I2C communications
+	Wire.begin();
+
+	//Initialize IMU
+	imu.init();
+	t0 = 0;
+	t1 = 0;
+	delta = 0;
+
+	Serial.write("Ready");
 }
 
 void loop()
 {
 	//Wait for data to arrive
-	if(Serial.available() == 5)
+	if(Serial.available() > 0)
 	{
 		data = Serial.readBytes(packet, 5);
 
-		if(data == 5)
+		if(data > 0)
 		{
 			//Print back the data sent
-			Serial.write(packet);
+			Serial.write(packet, 5);
 			Serial.flush();
 		}
 		else
@@ -78,11 +121,15 @@ void loop()
 		}
 
 		//Packet[0] holds left motor commands
-		myRoboteq.roboteq_set_speed_left(packet[0]);
+		speed_l = myRoboteq.roboteq_set_speed_left(packet[0]);
+        serial2.write(speed_l.c_str(), speed_l.length());
+        serial2.flush();
 		
 
 		//Packet[1] holds right motor commands
-		myRoboteq.roboteq_set_speed_right(packet[1]);
+		speed_r = myRoboteq.roboteq_set_speed_right(packet[1]);
+        serial2.write(speed_r.c_str(), speed_r.length());
+        serial2.flush();
 
 		//Packet[2] holds paddle LA commands
 		if(packet[2] == '0')
@@ -114,4 +161,23 @@ void loop()
 			myMaxon.off();
 		}
 	}
+
+	//Get IMU data
+	t1 = micros()
+
+	imu.getValues(values);
+	imu.getYawPitchRoll(&values[3]);
+
+	//Compute x, y, z positions
+	delta = t1 - t0;
+	values[0] *= delta * delta;
+	values[1] *= delta * delta;
+	values[2] *= delta * delta;
+
+	//Normalize positions to flat plane
+	values[0] *= cos(values[3]);
+	values[1] *= cos(values[4]);
+
+	//Update timestep
+	t0 = micros();
 }

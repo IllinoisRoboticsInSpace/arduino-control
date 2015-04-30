@@ -1,50 +1,52 @@
 #include "Roboteq.h"
 #include "Arduino.h"
+
 //make a roboteq object, initializing elements to 0
 roboteq::roboteq()
 {
-	curr_speed = 0;
-	curr_direction = 0;
+	speed_l = 0;
+    speed_r = 0;
+	dir = 0;
 
-	digitalWrite(ROBOTEQ_BRAKE, HIGH);
+	//digitalWrite(ROBOTEQ_BRAKE, HIGH);
 }	
 
 //open port at 115200 baud rate
-// int Roboteq::roboteq_init()
-// {
-// 	Serial1.begin(BAUD);
-// }
+int Roboteq::roboteq_init()
+{
+	serial2.begin(BAUD);
+}
 
 //takes a speed from -1000 to 1000 and sets the motors
-int roboteq::roboteq_set_speed_right(char c_speed)
-{
+String roboteq::roboteq_set_speed_right(char c_speed)
+{       
 	speed_r = int(c_speed);
 
 	//Scale to range of -1000, 1000
 	speed_r = -((speed_r - 127) * 8);
 
 	//check bounds
-	if(speed_r > MAX || speed_r < MIN)
-		return -1;
+	if(speed_r > MAX)
+		speed_r = 1000;
 
-	digitalWrite(ROBOTEQ_BRAKE, LOW);
+	if(speed_r < MIN)
+		speed_r = -1000;
+
+	//digitalWrite(ROBOTEQ_BRAKE, LOW);
 
 	//Convert speed to usable parameter and parse to string
-	speed_str_r = String("!g 1 " + speed_r);
+	speed_str_r = "!g 1 ";
+    speed_str_r += String(speed_r);
+    speed_str_r += "\r";
 
 	//write go command, channel, and value
-	if(Serial2.print(speed_str_r) != (5+speed_str_r.length()))
-		return -1;
+    //serial2.write(speed_str_r.c_str(), speed_str_r.length());
 
-	//update current speed
-	curr_speed_r = speed_r;
-
-	Serial.println("curr_speed");
-	return 0;
+	return speed_str_r;
 }
 
 //takes a speed from -1000 to 1000 and sets the motors
-int roboteq::roboteq_set_speed_left(char c_speed)
+String roboteq::roboteq_set_speed_left(char c_speed)
 {
 	speed_l = int(c_speed);
 
@@ -52,23 +54,23 @@ int roboteq::roboteq_set_speed_left(char c_speed)
 	speed_l = (speed_l - 127) * 8;
 
 	//check bounds
-	if(speed_l > MAX || speed_l < MIN)
-		return -1;
+	if(speed_l > MAX)
+		speed_l = 1000;
 
-	digitalWrite(ROBOTEQ_BRAKE, LOW);
+	if(speed_r < MIN)
+		speed_l = -1000;
+
+	//digitalWrite(ROBOTEQ_BRAKE, LOW);
 
 	//Convert speed to usable parameter and parse to string
-	speed_str_l = String("!g 2 " + speed_l);
+    speed_str_l = "!g 2 ";
+	speed_str_l += String(speed_l);
+    speed_str_l += "\r";
 
 	//write go command, channel, and value
-	if(Serial2.print(speed_str_l) != (5+speed_str_l.length()))
-		return -1;
+    //serial2.write(speed_str_l.c_str(), speed_str_l.length());
 
-	//update current speed
-	curr_speed_l = speed_l;
-
-	Serial.println("curr_speed");
-	return 0;
+	return speed_str_l;
 }
 
 //takes a direction from -1000 to 1000 and sets the motors
@@ -84,29 +86,37 @@ int roboteq::roboteq_set_direction(int direction)
 	dir_str = String("!g 2 " + (direction * ANGULAR_TO_DIR)); 
 
 	//write go command, channel, and value
-	if(Serial2.print(dir_str) != (5+dir_str.length()))
+	if(serial2.print(dir_str) != (5+dir_str.length()))
 		return -1;
 
-	//update direction
-	curr_direction = direction;
-	Serial.println("curr_direction");
+	//Update direction
+	dir = direction;
+
 	return 0;
 }
 
-//return current speed
-int roboteq::roboteq_get_speed()
+//return current left motor speed
+int roboteq::roboteq_get_speed_right()
 {
-	return curr_speed;
+	return speed_r;
+
+}
+
+//return current left motor speed
+int roboteq::roboteq_get_speed_left()
+{
+	return speed_l;
+
 }
 
 //return current direction
 int roboteq::roboteq_get_direction()
 {
-	return curr_direction;
+	return dir;
 }
 
 //close the port
 void roboteq::roboteq_close()
 {
-	Serial1.end();
+	serial2.end();
 }
