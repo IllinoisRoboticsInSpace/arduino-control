@@ -21,9 +21,9 @@ int roboteq::roboteq_init()
 String roboteq::roboteq_set_speed_right(String speed_r)
 {
 	//Convert speed to usable parameter and parse to string
-	speed_str_r = "!g 1 ";
+	speed_str_r = "!G 1 ";
     speed_str_r += speed_r;
-    speed_str_r += "\r";
+    speed_str_r += "_";
 
 	//write go command, channel, and value
     //serial2.write(speed_str_r.c_str(), speed_str_r.length());
@@ -35,9 +35,9 @@ String roboteq::roboteq_set_speed_right(String speed_r)
 String roboteq::roboteq_set_speed_left(String speed_l)
 {
 	//Convert speed to usable parameter and parse to string
-    speed_str_l = "!g 2 ";
+    speed_str_l = "!G 2 ";
 	speed_str_l += speed_l;
-    speed_str_l += "\r";
+    speed_str_l += "_";
 
 	//write go command, channel, and value
     //serial2.write(speed_str_l.c_str(), speed_str_l.length());

@@ -114,27 +114,28 @@ void loop()
 	//Wait for data to arrive
 	while(Serial.available() > 0)
 	{
-                str = "";
+        str = "";
 		str = Serial.readStringUntil('!');
 		idx_start = 0;
 		idx_end = str.length();
 
-                // Check we got good data
-                data = str.endsWith("#");
-                //Print the data back
-	        if (!(Serial.available() > 0))
-                {
-                  Serial.write(str.c_str(), str.length());
-                  if(data)
-                      Serial.write("\nData: True\n");
-                  else
-                      Serial.write("\nData: False\n");
-                  Serial.flush();
-                }
-         }
         // Check we got good data
-        //data = str.endsWith("#");
+        data = str.endsWith("#");
         //Print the data back
+	    if (!(Serial.available() > 0))
+        {
+            Serial.write(str.c_str(), str.length());
+            if(data)
+                Serial.write("\nData: True\n");
+            else
+                Serial.write("\nData: False\n");
+            Serial.flush();
+        }
+    }
+    
+    // Check we got good data
+    //data = str.endsWith("#");
+    //Print the data back
 	//Serial.write(str.c_str(), str.length());
 	//Serial.flush();
 
@@ -148,21 +149,21 @@ void loop()
 
 		//Packet[0] holds left motor commands
 		speed_l = myRoboteq.roboteq_set_speed_left(str.substring(idx_start, commaIdx[0]));
-        	serial2.write(speed_l.c_str(), speed_l.length());
-        	serial2.flush();
-                Serial.write("speed_l: ");
-                Serial.write(speed_l.c_str(), speed_l.length());
-                Serial.flush();
-                Serial.write("Feedback from roboteq left motor: ");
-                Serial.write(Serial.read());
+        serial2.write(speed_l.c_str(), speed_l.length());
+        serial2.flush();
+        Serial.write("speed_l: ");
+        Serial.write(speed_l.c_str(), speed_l.length());
+        Serial.flush();
+        Serial.write("Feedback from roboteq left motor: ");
+        Serial.write(Serial.read());
 
 		//Packet[1] holds right motor commands
 		speed_r = myRoboteq.roboteq_set_speed_right(str.substring(commaIdx[0]+1, commaIdx[1]));
-    	        serial2.write(speed_r.c_str(), speed_r.length());
-    	        serial2.flush();
-                Serial.write("speed_r: ");
-                Serial.write(speed_r.c_str(), speed_r.length());
-                Serial.flush();
+    	serial2.write(speed_r.c_str(), speed_r.length());
+    	serial2.flush();
+        Serial.write("speed_r: ");
+        Serial.write(speed_r.c_str(), speed_r.length());
+        Serial.flush();
 
 		//Packet[2] holds paddle LA commands
 		if(str[commaIdx[2]-1] == '0')
@@ -199,9 +200,9 @@ void loop()
 		}
 		else
 		{
-				myMaxon.off();
+			myMaxon.off();
 		}
-                data = false;
+            data = false;
 	}
 /*
 	//Get IMU data
