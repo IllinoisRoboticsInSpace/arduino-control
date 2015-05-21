@@ -10,6 +10,7 @@
 #define DISP_HALL 		53
 #define DISP_POT 		85
 #define DISP_CURRENT 	86
+#define 
 
 class disp
 {
