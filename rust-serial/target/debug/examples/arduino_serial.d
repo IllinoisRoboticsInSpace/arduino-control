@@ -1,0 +1,1 @@
+/Users/ajayarasanipalai/rust-arduino-serial/target/debug/examples/arduino_serial: /Users/ajayarasanipalai/rust-arduino-serial/examples/arduino_serial.rs /Users/ajayarasanipalai/rust-arduino-serial/src/lib.rs
