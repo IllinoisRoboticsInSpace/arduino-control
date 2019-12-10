@@ -24,8 +24,11 @@ First if creates the serial object. on the ttyACM0 port. This port should be the
 Then square is just an array that contains the power setting for each motor (1 and 2) to create a square.  The commands are then sent with the for loop.
 Lastly the exit_handler function shuts off the motors in case of a forced stop of the program (e.g. ctrl + c)
 
+# RemoteManual.py
 
-TODO:
+Allows to send commands directly to Arduino from python via terminal
+
+# TODO:
 New communication protocol "[n]#[motor]$[power]" for n = 1, "[n]#[motor]$[power]#[motor]$[power]" for n = 2 etc.
 - [ ] Implement new communication protocol on Python side
 - [ ] Implement new communication protocol on Arduino side
