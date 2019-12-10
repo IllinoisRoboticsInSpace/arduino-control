@@ -1,11 +1,10 @@
-from ArduinoSerial import sendData
+from ArduinoSerial import sendData, beginTransmission
 import serial
 import time
 import atexit
 
-ser = serial.Serial("/dev/ttyACM0",9600)
+ser = serial.Serial("/dev/ttyACM0",115200)
 ser.flushInput()
-
 
 #The next five lines allow the motors to stop once the ctrl+c command is given to abort the program.
 def exit_handler():
@@ -14,15 +13,16 @@ def exit_handler():
 
 atexit.register(exit_handler)
 
-square = [(100,100),(100,-100),(100,100),(100,-100),(100,100),(100,-100),(100,100),(100,-100),(0,0)] #This should create a square
+if ser.is_open:
+	beginTransmission(ser)
+else:
+	print("Serial Closed")
 
-sendData(ser,2,0) #This was a test intialization command, can be removed
-time.sleep(1)
+square = [(100,100),(100,-100),(100,100),(100,-100),(100,100),(100,-100),(100,100),(100,-100),(0,0)] #This should create a square
 
 for cmd in square:
 	sendData(ser, 1, cmd[0]) #This sends the commands to arduino, for each motor
 	sendData(ser, 2, cmd[1])
-
 
 
 
